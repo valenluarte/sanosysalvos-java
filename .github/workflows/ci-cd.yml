@@ -11,55 +11,58 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      - name: Checkout código
         uses: actions/checkout@v3
 
-      - name: Set up JDK 17
+      - name: Configurar JDK 17
         uses: actions/setup-java@v3
         with:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Build user-service
+      - name: Compilar user-service
         run: |
           cd user-service
           mvn clean package -DskipTests
 
-      - name: Build pet-service
+      - name: Compilar pet-service
         run: |
           cd pet-service
           mvn clean package -DskipTests
 
-      - name: Build report-service
+      - name: Compilar report-service
         run: |
           cd report-service
           mvn clean package -DskipTests
 
-      - name: Build matching-service
+      - name: Compilar matching-service
         run: |
           cd matching-service
           mvn clean package -DskipTests
 
-      - name: Build Docker images
+      - name: Construir imágenes Docker
         run: docker compose build
 
-      - name: Start services
+      - name: Levantar servicios
         run: docker compose up -d
 
-      - name: Wait for services
+      - name: Esperar a que los servicios estén listos
         run: sleep 30
 
-      - name: Check services
+      - name: Verificar servicios
         run: docker compose ps
 
-      - name: Test user-service
+      - name: Probar user-service
         run: curl -f http://localhost:8082/users || exit 1
 
-      - name: Test pet-service
+      - name: Probar pet-service
         run: curl -f http://localhost:8083/pets || exit 1
 
-      - name: Test report-service
+      - name: Probar report-service
         run: curl -f http://localhost:8084/reports || exit 1
 
-      - name: Test matching-service
-        run: curl -f http://localhost:8085/matching || exit 1
+      - name: Probar matching-service
+        run: |
+          curl -f -X POST http://localhost:8085/matching \
+            -H "Content-Type: application/json" \
+            -d '{"petType":"Perro","petColor":"Dorado","petBreed":"Labrador","latitude":-33.456789,"longitude":-70.678901,"reportType":"LOST"}' || exit 1
