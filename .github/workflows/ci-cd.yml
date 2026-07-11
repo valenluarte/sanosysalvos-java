@@ -41,16 +41,16 @@ jobs:
           mvn clean package -DskipTests
 
       - name: Build Docker images
-        run: docker-compose build
+        run: docker compose build
 
       - name: Start services
-        run: docker-compose up -d
+        run: docker compose up -d
 
       - name: Wait for services
         run: sleep 30
 
       - name: Check services
-        run: docker ps
+        run: docker compose ps
 
       - name: Test user-service
         run: curl -f http://localhost:8082/users || exit 1
@@ -60,3 +60,6 @@ jobs:
 
       - name: Test report-service
         run: curl -f http://localhost:8084/reports || exit 1
+
+      - name: Test matching-service
+        run: curl -f http://localhost:8085/matching || exit 1
