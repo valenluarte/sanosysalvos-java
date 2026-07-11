@@ -52,6 +52,9 @@ jobs:
       - name: Verificar servicios
         run: docker compose ps
 
+      - name: Ver logs de matching-service
+        run: docker compose logs matching-service
+
       - name: Probar user-service
         run: curl -f http://localhost:8082/users || exit 1
 
