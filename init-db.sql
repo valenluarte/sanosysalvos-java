@@ -1,0 +1,4 @@
+CREATE DATABASE user_db;
+CREATE DATABASE pet_db;
+CREATE DATABASE report_db;
+CREATE DATABASE matching_db;

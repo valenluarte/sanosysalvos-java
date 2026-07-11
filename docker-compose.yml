@@ -1,0 +1,104 @@
+version: '3.8'
+
+services:
+  # PostgreSQL para todos los servicios
+  postgres:
+    image: postgres:15
+    container_name: postgres-sanosysalvos
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # user-service
+  user-service:
+    build: ./user-service
+    container_name: user-service
+    ports:
+      - "8082:8082"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/user_db
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - app-network
+
+  # pet-service
+  pet-service:
+    build: ./pet-service
+    container_name: pet-service
+    ports:
+      - "8083:8083"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/pet_db
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      PET_SERVICE_URL: http://pet-service:8083
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - app-network
+
+  # report-service
+  report-service:
+    build: ./report-service
+    container_name: report-service
+    ports:
+      - "8084:8084"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/report_db
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      PET_SERVICE_URL: http://pet-service:8083
+      MATCHING_SERVICE_URL: http://matching-service:8085
+    depends_on:
+      postgres:
+        condition: service_healthy
+      pet-service:
+        condition: service_started
+      matching-service:
+        condition: service_started
+    networks:
+      - app-network
+
+  # matching-service
+  matching-service:
+    build: ./matching-service
+    container_name: matching-service
+    ports:
+      - "8085:8085"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/matching_db
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      PET_SERVICE_URL: http://pet-service:8083
+    depends_on:
+      postgres:
+        condition: service_healthy
+      pet-service:
+        condition: service_started
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  postgres-data:

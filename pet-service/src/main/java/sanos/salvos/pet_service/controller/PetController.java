@@ -1,8 +1,9 @@
 package sanos.salvos.pet_service.controller;
 
+import jakarta.validation.Valid;
+import org.springframework.web.bind.annotation.*;
 import sanos.salvos.pet_service.model.Pet;
 import sanos.salvos.pet_service.service.PetService;
-import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -26,9 +27,24 @@ public class PetController {
         return service.getById(id);
     }
 
+    @GetMapping("/user/{userId}")
+    public List<Pet> getPetsByUserId(@PathVariable Long userId) {
+        return service.getPetsByUserId(userId);
+    }
+
+    @GetMapping("/status/{status}")
+    public List<Pet> getByStatus(@PathVariable String status) {
+        return service.getPetsByStatus(status);
+    }
+
     @PostMapping
-    public Pet create(@RequestBody Pet pet) {
+    public Pet create(@Valid @RequestBody Pet pet) {
         return service.save(pet);
+    }
+
+    @PutMapping("/{id}")
+    public Pet update(@PathVariable Long id, @Valid @RequestBody Pet pet) {
+        return service.update(id, pet);
     }
 
     @DeleteMapping("/{id}")

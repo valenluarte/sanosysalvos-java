@@ -2,6 +2,7 @@ package sanos.salvos.user_service.controller;
 
 import sanos.salvos.user_service.model.User;
 import sanos.salvos.user_service.service.UserService;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -27,8 +28,13 @@ public class UserController {
     }
 
     @PostMapping
-    public User create(@RequestBody User user) {
+    public User create(@Valid @RequestBody User user) {
         return service.createUser(user);
+    }
+
+    @PutMapping("/{id}")
+    public User updateUser(@PathVariable Long id, @Valid @RequestBody User user) {
+        return service.update(id, user);
     }
 
     @DeleteMapping("/{id}")

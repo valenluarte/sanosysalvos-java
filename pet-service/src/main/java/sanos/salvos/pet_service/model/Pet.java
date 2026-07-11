@@ -1,6 +1,8 @@
 package sanos.salvos.pet_service.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 @Entity
 @Table(name = "pets")
@@ -10,19 +12,41 @@ public class Pet {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank(message = "El nombre es obligatorio")
+    @Column(nullable = false)
     private String name;
+
+    @NotBlank(message = "El tipo es obligatorio para el matching")
+    @Column(nullable = false)
     private String type;
+
+    @NotBlank(message = "La raza es obligatoria para el matching")
+    @Column(nullable = false)
     private String breed;
+
+    @NotBlank(message = "El color es obligatorio para el matching")
+    @Column(nullable = false)
     private String color;
+
     private String status;
 
+    @NotNull(message = "La latitud es obligatoria para el matching")
+    @Column(nullable = false)
     private Double latitude;
+
+    @NotNull(message = "La longitud es obligatoria para el matching")
+    @Column(nullable = false)
     private Double longitude;
 
+    @NotNull(message = "El userId es obligatorio")
+    @Column(nullable = false)
     private Long userId;
+
+    private String locationAddress;
 
     public Pet() {}
 
+    // Getters y Setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 
@@ -49,4 +73,7 @@ public class Pet {
 
     public Long getUserId() { return userId; }
     public void setUserId(Long userId) { this.userId = userId; }
+
+    public String getLocationAddress() { return locationAddress; }
+    public void setLocationAddress(String locationAddress) { this.locationAddress = locationAddress; }
 }
